@@ -4,13 +4,18 @@ import br.com.ehmf.NutriAI.model.Receita;
 import br.com.ehmf.NutriAI.repository.ReceitaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ReceitaService {
 
     private final ReceitaRepository receitaRepository;
+    private final NutricionalService nutricionalService;
 
-    public ReceitaService(ReceitaRepository receitaRepository) {
+    public ReceitaService(ReceitaRepository receitaRepository,
+                          NutricionalService nutricionalService) {
         this.receitaRepository = receitaRepository;
+        this.nutricionalService = nutricionalService;
     }
 
     public Receita save(Receita receita) {
@@ -60,5 +65,15 @@ public class ReceitaService {
             receita.setPorcoes(updatedReceita.getPorcoes());
             return receitaRepository.save(receita);
         }).orElse(null);
+    }
+
+    //calcular valores nutricionais por receita
+    public Optional<Receita> calcularNutricionalPorReceita(Long id){
+        return receitaRepository.findById(id).map(
+                receita -> {
+                    nutricionalService.calcularNutricionalPorReceita(receita);
+                    return receitaRepository.save(receita);
+                }
+        );
     }
 }

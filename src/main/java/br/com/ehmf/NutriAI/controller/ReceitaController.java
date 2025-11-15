@@ -32,4 +32,11 @@ public class ReceitaController {
         return ResponseEntity.ok(receitaSalva);
     }
 
+    @GetMapping("/{id}/calcula-nutricional")
+    public ResponseEntity<Receita> calcularInformacoesNutricionais(@PathVariable Long id) {
+        return receitaService.calcularNutricionalPorReceita(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
